@@ -1,41 +1,52 @@
+
 import flask
 from app.models.leads_model import Leads
-from flask import Blueprint, jsonify, request, current_app
+from flask import Blueprint, jsonify, request
 from sqlalchemy import exc
 
 bp_leads = Blueprint('vaccine', __name__, url_prefix='/api')
-
-# E-mail e telefone único;
-# Telefone obrigatoriamente no formato (xx)xxxxx-xxxx.
 
 @bp_leads.route('/lead', methods=['POST', 'GET', 'PATCH', 'DELETE'])
 def get_create():
   if flask.request.method == 'POST':
     try:
       data = request.json
-      
-      # Corpo da requisição obrigatoriamente
-      #  apenas com name, email e phone, sendo todos os campos do tipo string.
-
-      if Leads.is_phone_Valid(data['phone']):
-        return "Cpf must contain 11 numbers"
-      lead = Leads(**data)
-      session = current_app.db.session
-      session.add(lead)
-      session.commit()
-      data = lead.query_to_json()
-      return data
+      if not Leads.check_keys(**data):
+        return "You must send name, email and phone data and they must be string type"
+      if Leads.check_phone_format(**data):
+        return "Phone must be in this format: (xx)xxxxx-xxxx"
+      return Leads.insert_user(**data) 
     except exc.IntegrityError:
-      return 'Cpf already exists', 400
+      return 'Email and name already exist', 400
 
-  elif flask.request.method == 'GET':
+  if flask.request.method == 'GET':
     try:
-      data = Vaccine.query.all()
-      data_to_json = [ vaccine.query_to_json() for vaccine in data]
-      return jsonify(data_to_json)
+      return jsonify(Leads.get_all_users())
     except exc.OperationalError: 
       return 'Database does not exist', 204
-  elif flask.request.method == 'PATCH':
-    ...
-  else:
-    ...
+
+  if flask.request.method == 'PATCH':
+    try:
+      data = request.json
+      if Leads.check_data_key(**data):
+        if Leads.patch_user_data(**data) == None:
+          return "User does not exist", 404
+        return "", 200
+      else:
+        return "You can only send key email through the patch route" 
+    except AttributeError:
+      return "User does not exist", 404
+
+  if flask.request.method == 'DELETE':
+    try:
+      data = request.json
+      if Leads.check_data_key(**data):
+        if Leads.delete_user_data(**data) == None:
+          return "User does not exist"
+        return "", 200
+      else:
+        return "You can only send key email through the patch route"
+    except AttributeError:
+      return "User does not exist", 404
+    
+
