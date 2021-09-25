@@ -33,7 +33,7 @@ def get_create():
           return "User does not exist", 404
         return "", 200
       else:
-        return "You can only send key email through the patch route" 
+        return "You can only send key email through the patch route", 406 
     except exc.IntegrityError:
       return "User does not exist", 404
 
@@ -45,7 +45,7 @@ def get_create():
           return "User does not exist", 404
         return "", 200
       else:
-        return "You can only send key email through the patch route"
+        return "You can only send key email through the patch route", 406
     except exc.IntegrityError:
       return "User does not exist", 404
     
