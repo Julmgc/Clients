@@ -12,9 +12,9 @@ def get_create():
     try:
       data = request.json
       if not Leads.check_keys(**data):
-        return "You must send name, email and phone data and they must be string type"
+        return "You must send name, email and phone data and they must be string type", 406
       if Leads.check_phone_format(**data):
-        return "Phone must be in this format: (xx)xxxxx-xxxx"
+        return "Phone must be in this format: (xx)xxxxx-xxxx", 406
       return Leads.insert_user(**data) 
     except exc.IntegrityError:
       return 'Email and name already exist', 409
