@@ -17,7 +17,7 @@ def get_create():
         return "Phone must be in this format: (xx)xxxxx-xxxx"
       return Leads.insert_user(**data) 
     except exc.IntegrityError:
-      return 'Email and name already exist', 400
+      return 'Email and name already exist', 409
 
   if flask.request.method == 'GET':
     try:
@@ -34,7 +34,7 @@ def get_create():
         return "", 200
       else:
         return "You can only send key email through the patch route" 
-    except AttributeError:
+    except exc.IntegrityError:
       return "User does not exist", 404
 
   if flask.request.method == 'DELETE':
@@ -42,11 +42,11 @@ def get_create():
       data = request.json
       if Leads.check_data_key(**data):
         if Leads.delete_user_data(**data) == None:
-          return "User does not exist"
+          return "User does not exist", 404
         return "", 200
       else:
         return "You can only send key email through the patch route"
-    except AttributeError:
+    except exc.IntegrityError:
       return "User does not exist", 404
     
 
