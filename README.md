@@ -1,6 +1,6 @@
 ## <font size="7">**Clients DB**</font>
 
-​### <font color="gree"> CRUD app for registering clients, using python and Flask-SQLAlchemy </font> Saves a movie
+​### <font color="gree"> API for registering clients, using python and Flask-SQLAlchemy </font> Saves a movie
 
 ## <font size="6">Base URL /api </font>
 
